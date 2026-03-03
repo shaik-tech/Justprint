@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PrintQ – New Order</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+.stepper { display:flex; align-items:center; margin-bottom:30px; }
+.step-dot { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; transition:all .3s; }
+.step-done  { background:var(--success); color:#fff; }
+.step-active{ background:var(--accent); color:#fff; box-shadow:0 0 0 3px #6c63ff33; }
+.step-todo  { background:var(--border); color:var(--faint); }
+.step-label { font-size:13px; margin-left:8px; white-space:nowrap; }
+.step-label.active { font-weight:600; color:var(--text); }
+.step-label.todo   { color:var(--faint); }
+.step-line { flex:1; height:1px; background:var(--border); margin:0 10px; transition:background .3s; }
+.step-line.done { background:var(--success); }
+.step-content { max-width:580px; }
+.step-panel { display:none; }
+.step-panel.active { display:block; animation:fadeUp .3s ease; }
+.upload-zone { border:2px dashed var(--border); border-radius:12px; padding:42px 20px; text-align:center; cursor:pointer; transition:all .2s; }
+.upload-zone:hover, .upload-zone.dragover { border-color:var(--accent); background:var(--accent-dim); }
+.upload-zone.has-file { border-color:var(--success); background:#22d3a510; }
+.upload-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+.shop-option { border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:12px; cursor:pointer; transition:all .2s; }
+.shop-option:hover { border-color:var(--accent); background:var(--surface-h); }
+.shop-option.selected { border-color:var(--accent); background:var(--accent-dim); }
+.summary-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px; }
+.summary-row:last-of-type { border-bottom:none; }
+.total-row { display:flex; justify-content:space-between; padding:14px 0; }
+.cod-note { background:#f59e0b11; border:1px solid #f59e0b33; border-radius:10px; padding:10px 14px; font-size:12px; color:var(--warning); margin-bottom:18px; }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+    <div><div class="logo-name">PrintQ</div><div class="logo-role">customer</div></div>
+  </div>
+  <nav>
+    <a href="customer-dashboard.html" class="nav-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
+    <a href="new-order.html" class="nav-item active"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> New Order</a>
+    <a href="my-orders.html" class="nav-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> My Orders</a>
+    <a href="find-shops.html" class="nav-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Find Shops</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-row"><div class="avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><div class="user-name">Arjun Kumar</div><div class="user-email">customer@printq.in</div></div></div>
+    <div class="logout-row" onclick="window.location='login.html'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</div>
+  </div>
+</aside>
+
+<main class="main fade">
+  <div class="page-title">New Print Order</div>
+  <div class="page-sub">Upload, configure, and send to a print shop</div>
+
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <div class="step-dot step-active" id="dot-1">1</div><span class="step-label active" id="lbl-1">Upload</span>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-dot step-todo" id="dot-2">2</div><span class="step-label todo" id="lbl-2">Configure</span>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-dot step-todo" id="dot-3">3</div><span class="step-label todo" id="lbl-3">Shop</span>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-dot step-todo" id="dot-4">4</div><span class="step-label todo" id="lbl-4">Confirm</span>
+  </div>
+
+  <div class="step-content">
+    <!-- Step 1 -->
+    <div class="step-panel active" id="panel-1">
+      <div class="card">
+        <div class="card-title">Upload Document</div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none" onchange="onFile(this)"/>
+          <div class="upload-icon" id="uploadIcon" style="background:var(--accent-dim)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div id="uploadText" style="font-weight:600;margin-bottom:4px">Click to upload</div>
+          <div style="font-size:12px;color:var(--muted)">PDF, DOC, DOCX, PPT supported</div>
+        </div>
+        <div style="margin-top:18px"><button class="btn btn-primary btn-disabled" id="btn1" onclick="goTo(2)">Continue →</button></div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-panel" id="panel-2">
+      <div class="card">
+        <div class="card-title">Print Settings</div>
+        <div class="form-row">
+          <div><label class="field-label">Print Type</label><select class="field-select" id="colorType"><option value="bw">⚫ Black &amp; White</option><option value="color">🎨 Color</option></select></div>
+          <div><label class="field-label">Sides</label><select class="field-select"><option>Single Sided</option><option>Double Sided</option></select></div>
+          <div><label class="field-label">Page Range</label><select class="field-select"><option>All Pages</option><option>Custom Range</option></select></div>
+          <div><label class="field-label">Copies</label><input type="number" class="field-input" id="copies" value="1" min="1"/></div>
+        </div>
+        <div style="display:flex;gap:10px"><button class="btn btn-ghost" onclick="goTo(1)">← Back</button><button class="btn btn-primary" onclick="goTo(3)">Choose Shop →</button></div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-panel" id="panel-3">
+      <div class="syne fw-bold mb-16" style="font-size:15px">Select Print Shop</div>
+      <div class="shop-option" id="shop-1" onclick="selectShop(1,'Ravi Xerox',1.5,5)">
+        <div class="flex justify-between items-center">
+          <div class="flex gap-16 items-center">
+            <div class="icon-box" style="background:var(--accent-dim)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+            <div><div style="font-weight:600;margin-bottom:3px">Ravi Xerox</div><div style="font-size:12px;color:var(--muted)">📍 MG Road, near bus stand</div><div style="font-size:12px;color:var(--muted);margin-top:3px">B&amp;W ₹1.5/pg · Color ₹5/pg</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="badge badge-open">Open</span><span id="sel-1" style="display:none;color:var(--accent);font-size:12px;font-weight:700">✓ Selected</span></div>
+        </div>
+      </div>
+      <div class="shop-option" id="shop-2" onclick="selectShop(2,'City Prints',2,6)">
+        <div class="flex justify-between items-center">
+          <div class="flex gap-16 items-center">
+            <div class="icon-box" style="background:var(--accent-dim)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+            <div><div style="font-weight:600;margin-bottom:3px">City Prints</div><div style="font-size:12px;color:var(--muted)">📍 Koramangala 5th Block</div><div style="font-size:12px;color:var(--muted);margin-top:3px">B&amp;W ₹2/pg · Color ₹6/pg</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="badge badge-open">Open</span><span id="sel-2" style="display:none;color:var(--accent);font-size:12px;font-weight:700">✓ Selected</span></div>
+        </div>
+      </div>
+      <div class="shop-option" id="shop-3" onclick="selectShop(3,'Quick Copy',1,4.5)">
+        <div class="flex justify-between items-center">
+          <div class="flex gap-16 items-center">
+            <div class="icon-box" style="background:var(--accent-dim)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+            <div><div style="font-weight:600;margin-bottom:3px">Quick Copy</div><div style="font-size:12px;color:var(--muted)">📍 HSR Layout Sector 4</div><div style="font-size:12px;color:var(--muted);margin-top:3px">B&amp;W ₹1/pg · Color ₹4.5/pg</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="badge badge-busy">Busy</span><span id="sel-3" style="display:none;color:var(--accent);font-size:12px;font-weight:700">✓ Selected</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px"><button class="btn btn-ghost" onclick="goTo(2)">← Back</button><button class="btn btn-primary btn-disabled" id="btn3" onclick="goTo(4)">Review →</button></div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-panel" id="panel-4">
+      <div class="card">
+        <div class="card-title">Order Summary</div>
+        <div class="summary-row"><span class="text-muted">File</span><span id="sum-file" style="font-weight:500">—</span></div>
+        <div class="summary-row"><span class="text-muted">Shop</span><span id="sum-shop" style="font-weight:500">—</span></div>
+        <div class="summary-row"><span class="text-muted">Type</span><span id="sum-type" style="font-weight:500">—</span></div>
+        <div class="summary-row"><span class="text-muted">Copies</span><span id="sum-copies" style="font-weight:500">—</span></div>
+        <div class="total-row"><span class="syne fw-bold" style="font-size:16px">Total</span><span class="syne" style="font-size:22px;font-weight:800;color:var(--accent)" id="sum-price">—</span></div>
+        <div class="cod-note">💵 Pay cash when collecting your prints</div>
+        <div style="display:flex;gap:10px"><button class="btn btn-ghost" onclick="goTo(3)">← Back</button><button class="btn btn-primary" onclick="window.location='my-orders.html'">✓ Place Order</button></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let step=1, fileName=null, selectedShop=null, shopBw=1.5, shopColor=5;
+
+function onFile(input){
+  if(!input.files[0]) return;
+  fileName = input.files[0].name;
+  document.getElementById('uploadZone').classList.add('has-file');
+  document.getElementById('uploadIcon').style.background='#22d3a522';
+  document.getElementById('uploadIcon').innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22d3a5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+  document.getElementById('uploadText').textContent = fileName;
+  document.getElementById('uploadText').style.color='var(--success)';
+  document.getElementById('btn1').classList.remove('btn-disabled');
+}
+
+function selectShop(id, name, bw, color){
+  [1,2,3].forEach(i=>{ document.getElementById('shop-'+i).classList.remove('selected'); document.getElementById('sel-'+i).style.display='none'; });
+  document.getElementById('shop-'+id).classList.add('selected');
+  document.getElementById('sel-'+id).style.display='block';
+  selectedShop=name; shopBw=bw; shopColor=color;
+  document.getElementById('btn3').classList.remove('btn-disabled');
+}
+
+function goTo(n){
+  if(n===4){
+    const ct = document.getElementById('colorType').value;
+    const copies = parseInt(document.getElementById('copies').value)||1;
+    const price = (ct==='bw'?shopBw:shopColor)*copies*12;
+    document.getElementById('sum-file').textContent=fileName||'—';
+    document.getElementById('sum-shop').textContent=selectedShop||'—';
+    document.getElementById('sum-type').textContent=ct==='bw'?'Black & White':'Color';
+    document.getElementById('sum-copies').textContent=copies;
+    document.getElementById('sum-price').textContent='₹'+price.toFixed(2);
+  }
+  document.getElementById('panel-'+step).classList.remove('active');
+  document.getElementById('panel-'+n).classList.add('active');
+  // update stepper
+  for(let i=1;i<=4;i++){
+    const dot=document.getElementById('dot-'+i), lbl=document.getElementById('lbl-'+i);
+    dot.className='step-dot '+(i<n?'step-done':i===n?'step-active':'step-todo');
+    dot.innerHTML=i<n?'✓':i;
+    lbl.className='step-label '+(i===n?'active':'todo');
+    if(i<=3){ const line=document.getElementById('line-'+i); line.className='step-line '+(i<n?'done':'todo'); }
+  }
+  step=n;
+}
+</script>
+</body>
+</html>

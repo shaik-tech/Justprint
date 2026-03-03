@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PrintQ – Customer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+.two-col { display:grid; grid-template-columns:1fr 280px; gap:18px; }
+.order-row { display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--border); }
+.order-row:last-child { border-bottom:none; }
+.shop-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
+.shop-row:last-child { border-bottom:none; }
+.cta-card { background:linear-gradient(135deg,#6c63ff22,#6c63ff12); border:1px solid #6c63ff44 !important; text-align:center; padding:28px 20px !important; }
+.cta-icon { width:46px; height:46px; background:var(--accent); border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+    <div><div class="logo-name">PrintQ</div><div class="logo-role">customer</div></div>
+  </div>
+  <nav>
+    <a href="customer-dashboard.html" class="nav-item active">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
+    <a href="new-order.html" class="nav-item">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> New Order</a>
+    <a href="my-orders.html" class="nav-item">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> My Orders</a>
+    <a href="find-shops.html" class="nav-item">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Find Shops</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-row">
+      <div class="avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div><div class="user-name">Arjun Kumar</div><div class="user-email">customer@printq.in</div></div>
+    </div>
+    <div class="logout-row" onclick="window.location='login.html'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main fade">
+  <div class="page-title">Good morning, Arjun 👋</div>
+  <div class="page-sub">Here's an overview of your print orders</div>
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Orders <div class="stat-icon" style="background:#6c63ff22"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div></div>
+      <div class="stat-value">24</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Printing Now <div class="stat-icon" style="background:#38bdf822"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg></div></div>
+      <div class="stat-value" style="color:#38bdf8">1</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ready <div class="stat-icon" style="background:#22d3a522"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22d3a5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="stat-value" style="color:#22d3a5">2</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Spent <div class="stat-icon" style="background:#f59e0b22"><svg width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
+      <div class="stat-value" style="color:#f59e0b">₹342</div>
+    </div>
+  </div>
+
+  <!-- Two-col -->
+  <div class="two-col">
+    <div class="card">
+      <div class="flex justify-between items-center mb-20">
+        <div class="card-title" style="margin-bottom:0">Recent Orders</div>
+        <a href="my-orders.html" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <div class="order-row">
+        <div class="flex items-center gap-12">
+          <div class="icon-box" style="background:var(--accent-dim)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+          <div><div style="font-weight:500;font-size:14px">Assignment.pdf</div><div style="font-size:12px;color:var(--muted)">Ravi Xerox · 12 pages</div></div>
+        </div>
+        <div class="flex items-center gap-16"><span style="font-size:13px;font-weight:700">₹18</span><span class="badge badge-printing">Printing</span></div>
+      </div>
+      <div class="order-row">
+        <div class="flex items-center gap-12">
+          <div class="icon-box" style="background:var(--accent-dim)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+          <div><div style="font-weight:500;font-size:14px">Resume.docx</div><div style="font-size:12px;color:var(--muted)">City Prints · 3 pages</div></div>
+        </div>
+        <div class="flex items-center gap-16"><span style="font-size:13px;font-weight:700">₹9</span><span class="badge badge-ready">Ready ✓</span></div>
+      </div>
+      <div class="order-row">
+        <div class="flex items-center gap-12">
+          <div class="icon-box" style="background:var(--accent-dim)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+          <div><div style="font-weight:500;font-size:14px">Report.pdf</div><div style="font-size:12px;color:var(--muted)">Quick Copy · 45 pages</div></div>
+        </div>
+        <div class="flex items-center gap-16"><span style="font-size:13px;font-weight:700">₹67.5</span><span class="badge badge-pending">Pending</span></div>
+      </div>
+      <div class="order-row">
+        <div class="flex items-center gap-12">
+          <div class="icon-box" style="background:var(--accent-dim)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+          <div><div style="font-weight:500;font-size:14px">Notes.pdf</div><div style="font-size:12px;color:var(--muted)">Ravi Xerox · 8 pages</div></div>
+        </div>
+        <div class="flex items-center gap-16"><span style="font-size:13px;font-weight:700">₹12</span><span class="badge badge-accepted">Accepted</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card cta-card hoverable" onclick="window.location='new-order.html'">
+        <div class="cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="syne fw-bold" style="font-size:14px;margin-bottom:4px">New Print Order</div>
+        <div style="font-size:12px;color:var(--muted)">Upload &amp; print in minutes</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="font-size:13px">Nearby Shops</div>
+        <div class="shop-row"><div><div style="font-size:13px;font-weight:500">Ravi Xerox</div><div style="font-size:11px;color:var(--muted)">0.3 km</div></div><div style="color:var(--warning);font-size:12px;font-weight:700;display:flex;align-items:center;gap:3px">★ 4.8</div></div>
+        <div class="shop-row"><div><div style="font-size:13px;font-weight:500">City Prints</div><div style="font-size:11px;color:var(--muted)">0.7 km</div></div><div style="color:var(--warning);font-size:12px;font-weight:700;display:flex;align-items:center;gap:3px">★ 4.5</div></div>
+        <div class="shop-row"><div><div style="font-size:13px;font-weight:500">Quick Copy</div><div style="font-size:11px;color:var(--muted)">1.2 km</div></div><div style="color:var(--warning);font-size:12px;font-weight:700;display:flex;align-items:center;gap:3px">★ 4.2</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

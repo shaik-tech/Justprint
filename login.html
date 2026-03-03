@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrintQ – Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #13131a; --border: #2a2a3a;
+    --accent: #6c63ff; --accent-dim: #6c63ff20;
+    --success: #22d3a5; --warning: #f59e0b; --danger: #ef4444;
+    --text: #f0f0ff; --muted: #8888aa; --faint: #44445a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .bg-orb { position:fixed; border-radius:50%; pointer-events:none; }
+  .orb1 { width:600px; height:600px; background:radial-gradient(circle,#6c63ff18,transparent 65%); top:-150px; right:-150px; }
+  .orb2 { width:500px; height:500px; background:radial-gradient(circle,#22d3a512,transparent 65%); bottom:-120px; left:-120px; }
+  .wrap { width:100%; max-width:420px; padding:0 20px; animation:fadeUp .45s ease forwards; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+  .logo-wrap { text-align:center; margin-bottom:36px; }
+  .logo-icon { width:58px; height:58px; background:var(--accent); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+  .logo-icon svg { color:#fff; }
+  .logo-title { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; margin-bottom:4px; }
+  .logo-sub { font-size:14px; color:var(--muted); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:30px; }
+  .tab-group { display:flex; background:var(--bg); border-radius:10px; padding:4px; margin-bottom:22px; }
+  .tab { flex:1; padding:9px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:13px; font-family:'DM Sans',sans-serif; transition:all .2s; background:transparent; color:var(--muted); }
+  .tab.active { background:var(--accent); color:#fff; }
+  label { display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.6px; }
+  input, select { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:11px 14px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s; margin-bottom:16px; }
+  input:focus, select:focus { border-color:var(--accent); }
+  select option { background:var(--surface); }
+  .role-label { font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .role-group { display:flex; gap:8px; margin-bottom:16px; }
+  .role-btn { flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; font-size:12px; font-weight:600; font-family:'DM Sans',sans-serif; text-transform:capitalize; transition:all .15s; }
+  .role-btn.active { border-color:var(--accent); background:var(--accent-dim); color:var(--accent); }
+  .btn-primary { width:100%; padding:13px; background:var(--accent); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:filter .2s; margin-top:4px; }
+  .btn-primary:hover { filter:brightness(1.15); }
+  .footer-note { text-align:center; margin-top:18px; font-size:12px; color:var(--faint); }
+  .forgot { text-align:center; margin-top:14px; font-size:12px; color:var(--muted); cursor:pointer; }
+  .forgot:hover { color:var(--accent); }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="wrap">
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg>
+    </div>
+    <div class="logo-title">PrintQ</div>
+    <div class="logo-sub">Digital Print Order Platform</div>
+  </div>
+  <div class="card">
+    <div class="tab-group">
+      <button class="tab active" onclick="switchMode('login')">Sign In</button>
+      <button class="tab" onclick="switchMode('register')">Register</button>
+    </div>
+    <div id="register-fields" class="hidden">
+      <label>Full Name</label>
+      <input type="text" placeholder="Your full name" />
+      <label>I am a</label>
+      <select><option value="customer">👤 Customer</option><option value="shop">🖨️ Shop Owner</option></select>
+    </div>
+    <label>Email / Phone</label>
+    <input type="text" placeholder="you@example.com" />
+    <label>Password</label>
+    <input type="password" placeholder="••••••••" />
+    <div id="role-selector">
+      <div class="role-label">Sign in as:</div>
+      <div class="role-group">
+        <button class="role-btn active" onclick="setRole(this,'customer')">customer</button>
+        <button class="role-btn" onclick="setRole(this,'shop')">shop</button>
+        <button class="role-btn" onclick="setRole(this,'admin')">admin</button>
+      </div>
+    </div>
+    <button class="btn-primary" id="submit-btn" onclick="goToDashboard()">Sign In →</button>
+    <div class="forgot" id="forgot-link">Forgot password?</div>
+  </div>
+  <div class="footer-note">Secure · Encrypted · Trusted by 1,000+ users</div>
+</div>
+<script>
+  let currentRole = 'customer';
+  let currentMode = 'login';
+  function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0 && mode==='login') || (i===1 && mode==='register')));
+    document.getElementById('register-fields').classList.toggle('hidden', mode==='login');
+    document.getElementById('role-selector').classList.toggle('hidden', mode==='register');
+    document.getElementById('forgot-link').classList.toggle('hidden', mode==='register');
+    document.getElementById('submit-btn').textContent = mode==='login' ? 'Sign In →' : 'Create Account →';
+  }
+  function setRole(btn, role) {
+    currentRole = role;
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  function goToDashboard() {
+    const pages = { customer: 'customer-dashboard.html', shop: 'shop-dashboard.html', admin: 'admin-dashboard.html' };
+    window.location.href = pages[currentRole] || 'customer-dashboard.html';
+  }
+</script>
+</body>
+</html>
