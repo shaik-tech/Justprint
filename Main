@@ -1,0 +1,948 @@
+import { useState } from "react";
+
+const theme = {
+  bg: "#0a0a0f",
+  surface: "#13131a",
+  surfaceHover: "#1c1c27",
+  border: "#2a2a3a",
+  accent: "#6c63ff",
+  accentDim: "#6c63ff22",
+  accentHover: "#7c73ff",
+  success: "#22d3a5",
+  warning: "#f59e0b",
+  danger: "#ef4444",
+  textPrimary: "#f0f0ff",
+  textSecondary: "#8888aa",
+  textMuted: "#555570",
+};
+
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: ${theme.bg};
+    color: ${theme.textPrimary};
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  .syne { font-family: 'Syne', sans-serif; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: ${theme.bg}; }
+  ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 3px; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .fade-in { animation: fadeIn 0.4s ease forwards; }
+  .slide-in { animation: slideIn 0.3s ease forwards; }
+`;
+
+// ─── ICONS ────────────────────────────────────────────────────────────────────
+const Icon = ({ name, size = 18, color = "currentColor" }) => {
+  const icons = {
+    print: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"/><rect x="6" y="14" width="12" height="8"/></svg>,
+    upload: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
+    shop: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    order: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
+    check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+    x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    user: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+    settings: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    bell: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    logout: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+    clock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    pin: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
+    grid: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+    eye: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+    shield: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    star: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    menu: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+    file: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+// ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
+
+const Badge = ({ status }) => {
+  const map = {
+    pending: { color: theme.warning, bg: "#f59e0b22", label: "Pending" },
+    accepted: { color: theme.accent, bg: theme.accentDim, label: "Accepted" },
+    printing: { color: "#38bdf8", bg: "#38bdf822", label: "Printing" },
+    ready: { color: theme.success, bg: "#22d3a522", label: "Ready" },
+    rejected: { color: theme.danger, bg: "#ef444422", label: "Rejected" },
+    approved: { color: theme.success, bg: "#22d3a522", label: "Approved" },
+    "under review": { color: theme.warning, bg: "#f59e0b22", label: "Under Review" },
+  };
+  const s = map[status] || map.pending;
+  return (
+    <span style={{
+      background: s.bg, color: s.color,
+      border: `1px solid ${s.color}44`,
+      padding: "3px 10px", borderRadius: 20,
+      fontSize: 11, fontWeight: 600, letterSpacing: "0.5px",
+      textTransform: "uppercase", whiteSpace: "nowrap"
+    }}>{s.label}</span>
+  );
+};
+
+const Card = ({ children, style = {}, onClick }) => (
+  <div onClick={onClick} style={{
+    background: theme.surface, border: `1px solid ${theme.border}`,
+    borderRadius: 16, padding: 24,
+    transition: "all 0.2s ease",
+    cursor: onClick ? "pointer" : "default",
+    ...style
+  }}
+    onMouseEnter={e => { if (onClick) e.currentTarget.style.borderColor = theme.accent; e.currentTarget.style.background = theme.surfaceHover; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = theme.border; e.currentTarget.style.background = theme.surface; }}
+  >{children}</div>
+);
+
+const Button = ({ children, variant = "primary", onClick, disabled, small, icon, style = {} }) => {
+  const base = {
+    display: "inline-flex", alignItems: "center", gap: 8,
+    padding: small ? "8px 16px" : "12px 22px",
+    borderRadius: 10, border: "none", cursor: disabled ? "not-allowed" : "pointer",
+    fontSize: small ? 13 : 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+    transition: "all 0.2s ease", opacity: disabled ? 0.5 : 1,
+    ...style
+  };
+  const variants = {
+    primary: { background: theme.accent, color: "#fff" },
+    secondary: { background: theme.accentDim, color: theme.accent, border: `1px solid ${theme.accent}44` },
+    danger: { background: "#ef444422", color: theme.danger, border: `1px solid #ef444444` },
+    ghost: { background: "transparent", color: theme.textSecondary, border: `1px solid ${theme.border}` },
+    success: { background: "#22d3a522", color: theme.success, border: `1px solid #22d3a544` },
+  };
+  return (
+    <button style={{ ...base, ...variants[variant] }} onClick={onClick} disabled={disabled}
+      onMouseEnter={e => { if (!disabled) e.currentTarget.style.filter = "brightness(1.15)"; }}
+      onMouseLeave={e => { e.currentTarget.style.filter = "brightness(1)"; }}
+    >
+      {icon && <Icon name={icon} size={15} />}
+      {children}
+    </button>
+  );
+};
+
+const Input = ({ label, type = "text", value, onChange, placeholder, accept }) => (
+  <div style={{ marginBottom: 18 }}>
+    {label && <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: theme.textSecondary, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.6px" }}>{label}</label>}
+    <input
+      type={type} value={value} onChange={onChange} placeholder={placeholder} accept={accept}
+      style={{
+        width: "100%", background: theme.bg, border: `1px solid ${theme.border}`,
+        borderRadius: 10, padding: "11px 14px", color: theme.textPrimary,
+        fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none",
+        transition: "border-color 0.2s"
+      }}
+      onFocus={e => e.target.style.borderColor = theme.accent}
+      onBlur={e => e.target.style.borderColor = theme.border}
+    />
+  </div>
+);
+
+const Select = ({ label, value, onChange, options }) => (
+  <div style={{ marginBottom: 18 }}>
+    {label && <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: theme.textSecondary, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.6px" }}>{label}</label>}
+    <select value={value} onChange={onChange} style={{
+      width: "100%", background: theme.bg, border: `1px solid ${theme.border}`,
+      borderRadius: 10, padding: "11px 14px", color: theme.textPrimary,
+      fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none", cursor: "pointer"
+    }}>
+      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  </div>
+);
+
+const StatCard = ({ label, value, icon, accent = theme.accent }) => (
+  <Card style={{ padding: "20px 24px" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+      <span style={{ fontSize: 12, color: theme.textSecondary, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px" }}>{label}</span>
+      <div style={{ background: accent + "22", padding: 8, borderRadius: 8 }}>
+        <Icon name={icon} size={16} color={accent} />
+      </div>
+    </div>
+    <div style={{ fontSize: 28, fontWeight: 800, fontFamily: "'Syne', sans-serif", color: theme.textPrimary }}>{value}</div>
+  </Card>
+);
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+const Sidebar = ({ role, active, setActive }) => {
+  const navMap = {
+    customer: [
+      { id: "dashboard", label: "Dashboard", icon: "grid" },
+      { id: "upload", label: "New Order", icon: "upload" },
+      { id: "orders", label: "My Orders", icon: "order" },
+      { id: "shops", label: "Find Shops", icon: "shop" },
+    ],
+    shop: [
+      { id: "dashboard", label: "Dashboard", icon: "grid" },
+      { id: "orders", label: "Order Queue", icon: "order" },
+      { id: "profile", label: "Shop Profile", icon: "settings" },
+    ],
+    admin: [
+      { id: "dashboard", label: "Overview", icon: "grid" },
+      { id: "shops", label: "Manage Shops", icon: "shop" },
+      { id: "users", label: "Users", icon: "user" },
+      { id: "orders", label: "All Orders", icon: "order" },
+    ],
+  };
+  const nav = navMap[role] || [];
+
+  return (
+    <div style={{
+      width: 240, minHeight: "100vh", background: theme.surface,
+      borderRight: `1px solid ${theme.border}`,
+      display: "flex", flexDirection: "column", padding: "0 0 24px",
+      position: "fixed", top: 0, left: 0, zIndex: 100
+    }}>
+      {/* Logo */}
+      <div style={{ padding: "24px 24px 20px", borderBottom: `1px solid ${theme.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ background: theme.accent, borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Icon name="print" size={18} color="#fff" />
+          </div>
+          <div>
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 16, color: theme.textPrimary }}>PrintQ</div>
+            <div style={{ fontSize: 10, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "1px" }}>{role}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: "16px 12px" }}>
+        {nav.map(item => (
+          <div key={item.id} onClick={() => setActive(item.id)}
+            style={{
+              display: "flex", alignItems: "center", gap: 12,
+              padding: "11px 14px", borderRadius: 10, marginBottom: 4,
+              cursor: "pointer", transition: "all 0.15s ease",
+              background: active === item.id ? theme.accentDim : "transparent",
+              color: active === item.id ? theme.accent : theme.textSecondary,
+              fontWeight: active === item.id ? 600 : 400,
+              borderLeft: active === item.id ? `3px solid ${theme.accent}` : "3px solid transparent",
+            }}>
+            <Icon name={item.icon} size={17} color={active === item.id ? theme.accent : theme.textSecondary} />
+            <span style={{ fontSize: 14 }}>{item.label}</span>
+          </div>
+        ))}
+      </nav>
+
+      {/* Bottom */}
+      <div style={{ padding: "16px 12px", borderTop: `1px solid ${theme.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10, marginBottom: 4, cursor: "pointer" }}
+          onMouseEnter={e => e.currentTarget.style.background = theme.surfaceHover}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <div style={{ width: 30, height: 30, borderRadius: "50%", background: theme.accent + "33", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Icon name="user" size={14} color={theme.accent} />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: theme.textPrimary }}>
+              {role === "customer" ? "Arjun Kumar" : role === "shop" ? "Ravi Prints" : "Admin"}
+            </div>
+            <div style={{ fontSize: 11, color: theme.textMuted }}>{role}@printq.in</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10, cursor: "pointer", color: theme.textSecondary }}
+          onMouseEnter={e => { e.currentTarget.style.background = theme.surfaceHover; e.currentTarget.style.color = theme.danger; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = theme.textSecondary; }}
+        >
+          <Icon name="logout" size={16} />
+          <span style={{ fontSize: 14 }}>Logout</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── CUSTOMER VIEWS ───────────────────────────────────────────────────────────
+
+const CustomerDashboard = ({ setActive }) => {
+  const orders = [
+    { id: "ORD-001", shop: "Ravi Xerox", file: "Assignment.pdf", pages: 12, status: "printing", price: 18 },
+    { id: "ORD-002", shop: "City Prints", file: "Resume.docx", pages: 3, status: "ready", price: 9 },
+    { id: "ORD-003", shop: "Quick Copy", file: "Report.pdf", pages: 45, status: "pending", price: 67.5 },
+    { id: "ORD-004", shop: "Ravi Xerox", file: "Notes.pdf", pages: 8, status: "accepted", price: 12 },
+  ];
+
+  return (
+    <div className="fade-in">
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 26, fontWeight: 800, color: theme.textPrimary, marginBottom: 4 }}>
+          Good morning, Arjun 👋
+        </div>
+        <div style={{ color: theme.textSecondary, fontSize: 14 }}>Here's what's happening with your print orders</div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
+        <StatCard label="Total Orders" value="24" icon="order" />
+        <StatCard label="Printing Now" value="1" icon="print" accent="#38bdf8" />
+        <StatCard label="Ready to Collect" value="2" icon="check" accent={theme.success} />
+        <StatCard label="Total Spent" value="₹342" icon="star" accent={theme.warning} />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 16 }}>Recent Orders</div>
+            <Button variant="ghost" small onClick={() => setActive("orders")}>View All</Button>
+          </div>
+          <div>
+            {orders.map((o, i) => (
+              <div key={o.id} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "14px 0", borderBottom: i < orders.length - 1 ? `1px solid ${theme.border}` : "none"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ background: theme.accentDim, borderRadius: 8, padding: 9 }}>
+                    <Icon name="file" size={16} color={theme.accent} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 500, fontSize: 14, color: theme.textPrimary }}>{o.file}</div>
+                    <div style={{ fontSize: 12, color: theme.textSecondary }}>{o.shop} · {o.pages} pages</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: theme.textPrimary }}>₹{o.price}</span>
+                  <Badge status={o.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <Card style={{ background: `linear-gradient(135deg, ${theme.accent}22, ${theme.accentDim})`, border: `1px solid ${theme.accent}44`, cursor: "pointer" }}
+            onClick={() => setActive("upload")}>
+            <div style={{ textAlign: "center", padding: "8px 0" }}>
+              <div style={{ background: theme.accent, borderRadius: 12, width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                <Icon name="upload" size={22} color="#fff" />
+              </div>
+              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15, marginBottom: 4 }}>New Print Order</div>
+              <div style={{ fontSize: 12, color: theme.textSecondary }}>Upload & print in minutes</div>
+            </div>
+          </Card>
+
+          <Card>
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 14, fontSize: 14 }}>Nearby Shops</div>
+            {[
+              { name: "Ravi Xerox", dist: "0.3 km", rating: 4.8 },
+              { name: "City Prints", dist: "0.7 km", rating: 4.5 },
+              { name: "Quick Copy", dist: "1.2 km", rating: 4.2 },
+            ].map(s => (
+              <div key={s.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${theme.border}` }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>{s.name}</div>
+                  <div style={{ fontSize: 11, color: theme.textSecondary }}>{s.dist}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <Icon name="star" size={11} color={theme.warning} />
+                  <span style={{ fontSize: 12, color: theme.warning, fontWeight: 600 }}>{s.rating}</span>
+                </div>
+              </div>
+            ))}
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const UploadOrder = ({ setActive }) => {
+  const [step, setStep] = useState(1);
+  const [fileName, setFileName] = useState(null);
+  const [config, setConfig] = useState({ color: "bw", copies: 1, sided: "single", pages: "all" });
+  const [shop, setShop] = useState(null);
+
+  const shops = [
+    { id: 1, name: "Ravi Xerox", address: "MG Road, near bus stand", bw: 1.5, color: 5, status: "open" },
+    { id: 2, name: "City Prints", address: "Koramangala 5th Block", bw: 2, color: 6, status: "open" },
+    { id: 3, name: "Quick Copy", address: "HSR Layout Sector 4", bw: 1, color: 4.5, status: "busy" },
+  ];
+
+  const price = shop ? (config.color === "bw" ? shop.bw : shop.color) * config.copies * 12 : 0;
+
+  return (
+    <div className="fade-in">
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 4 }}>New Print Order</div>
+        <div style={{ color: theme.textSecondary, fontSize: 14 }}>Upload, configure, and send to a print shop</div>
+      </div>
+
+      {/* Steps */}
+      <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 32 }}>
+        {["Upload File", "Configure", "Choose Shop", "Confirm"].map((s, i) => (
+          <div key={s} style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                background: step > i + 1 ? theme.success : step === i + 1 ? theme.accent : theme.border,
+                fontSize: 12, fontWeight: 700,
+                color: step >= i + 1 ? "#fff" : theme.textMuted
+              }}>
+                {step > i + 1 ? <Icon name="check" size={13} color="#fff" /> : i + 1}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: step === i + 1 ? 600 : 400, color: step === i + 1 ? theme.textPrimary : theme.textMuted }}>
+                {s}
+              </span>
+            </div>
+            {i < 3 && <div style={{ width: 40, height: 1, background: step > i + 1 ? theme.success : theme.border, margin: "0 8px" }} />}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ maxWidth: 600 }}>
+        {step === 1 && (
+          <Card className="fade-in">
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 20 }}>Upload Your Document</div>
+            <div style={{
+              border: `2px dashed ${fileName ? theme.success : theme.border}`,
+              borderRadius: 12, padding: "40px 20px", textAlign: "center",
+              cursor: "pointer", transition: "all 0.2s",
+              background: fileName ? "#22d3a508" : "transparent"
+            }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = theme.accent}
+              onMouseLeave={e => e.currentTarget.style.borderColor = fileName ? theme.success : theme.border}
+              onClick={() => document.getElementById("fileInput").click()}
+            >
+              <input id="fileInput" type="file" style={{ display: "none" }} accept=".pdf,.doc,.docx,.ppt,.pptx"
+                onChange={e => setFileName(e.target.files[0]?.name)} />
+              {fileName ? (
+                <>
+                  <div style={{ background: "#22d3a522", borderRadius: 12, width: 50, height: 50, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                    <Icon name="file" size={24} color={theme.success} />
+                  </div>
+                  <div style={{ fontWeight: 600, color: theme.success, marginBottom: 4 }}>{fileName}</div>
+                  <div style={{ fontSize: 12, color: theme.textMuted }}>Click to change file</div>
+                </>
+              ) : (
+                <>
+                  <div style={{ background: theme.accentDim, borderRadius: 12, width: 50, height: 50, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                    <Icon name="upload" size={24} color={theme.accent} />
+                  </div>
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>Click to upload</div>
+                  <div style={{ fontSize: 12, color: theme.textMuted }}>PDF, DOC, DOCX, PPT supported</div>
+                </>
+              )}
+            </div>
+            <div style={{ marginTop: 20 }}>
+              <Button onClick={() => fileName && setStep(2)} disabled={!fileName} icon="order">
+                Continue
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {step === 2 && (
+          <Card className="fade-in">
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 20 }}>Print Configuration</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <Select label="Print Type" value={config.color}
+                onChange={e => setConfig({ ...config, color: e.target.value })}
+                options={[{ value: "bw", label: "⚫ Black & White" }, { value: "color", label: "🎨 Color" }]} />
+              <Select label="Sides" value={config.sided}
+                onChange={e => setConfig({ ...config, sided: e.target.value })}
+                options={[{ value: "single", label: "Single Sided" }, { value: "double", label: "Double Sided" }]} />
+              <Select label="Page Range" value={config.pages}
+                onChange={e => setConfig({ ...config, pages: e.target.value })}
+                options={[{ value: "all", label: "All Pages" }, { value: "custom", label: "Custom Range" }]} />
+              <Input label="Number of Copies" type="number" value={config.copies}
+                onChange={e => setConfig({ ...config, copies: parseInt(e.target.value) || 1 })} />
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
+              <Button onClick={() => setStep(3)} icon="shop">Choose Shop</Button>
+            </div>
+          </Card>
+        )}
+
+        {step === 3 && (
+          <div className="fade-in">
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 16 }}>Select a Print Shop</div>
+            {shops.map(s => (
+              <Card key={s.id} style={{ marginBottom: 12, border: shop?.id === s.id ? `1px solid ${theme.accent}` : `1px solid ${theme.border}` }}
+                onClick={() => setShop(s)}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div style={{ display: "flex", gap: 14 }}>
+                    <div style={{ background: theme.accentDim, borderRadius: 10, padding: 12 }}>
+                      <Icon name="print" size={20} color={theme.accent} />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600, marginBottom: 4 }}>{s.name}</div>
+                      <div style={{ fontSize: 12, color: theme.textSecondary, display: "flex", alignItems: "center", gap: 4 }}>
+                        <Icon name="pin" size={12} color={theme.textMuted} /> {s.address}
+                      </div>
+                      <div style={{ fontSize: 12, color: theme.textSecondary, marginTop: 4 }}>
+                        B&W: ₹{s.bw}/pg · Color: ₹{s.color}/pg
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                    <span style={{ fontSize: 11, color: s.status === "open" ? theme.success : theme.warning, fontWeight: 600, textTransform: "uppercase" }}>● {s.status}</span>
+                    {shop?.id === s.id && <Icon name="check" size={18} color={theme.accent} />}
+                  </div>
+                </div>
+              </Card>
+            ))}
+            <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+              <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
+              <Button disabled={!shop} onClick={() => setStep(4)} icon="order">Review Order</Button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <Card className="fade-in">
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 20 }}>Order Summary</div>
+            {[
+              ["File", fileName],
+              ["Shop", shop?.name],
+              ["Print Type", config.color === "bw" ? "Black & White" : "Color"],
+              ["Copies", config.copies],
+              ["Sides", config.sided === "single" ? "Single Sided" : "Double Sided"],
+              ["Pages", config.pages === "all" ? "All Pages" : "Custom Range"],
+            ].map(([k, v]) => (
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${theme.border}` }}>
+                <span style={{ color: theme.textSecondary, fontSize: 14 }}>{k}</span>
+                <span style={{ fontWeight: 500, fontSize: 14 }}>{v}</span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", marginTop: 4 }}>
+              <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 16 }}>Total</span>
+              <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 20, color: theme.accent }}>₹{price.toFixed(2)}</span>
+            </div>
+            <div style={{ background: "#f59e0b11", border: "1px solid #f59e0b33", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 12, color: "#f59e0b" }}>
+              💵 Payment via Cash on Delivery when you collect prints
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <Button variant="ghost" onClick={() => setStep(3)}>Back</Button>
+              <Button onClick={() => setActive("orders")} icon="check">Place Order</Button>
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const CustomerOrders = () => {
+  const orders = [
+    { id: "ORD-001", shop: "Ravi Xerox", file: "Assignment.pdf", pages: 12, status: "printing", price: 18, date: "Today, 10:30 AM", color: "B&W", copies: 1 },
+    { id: "ORD-002", shop: "City Prints", file: "Resume.docx", pages: 3, status: "ready", price: 9, date: "Today, 9:00 AM", color: "Color", copies: 1 },
+    { id: "ORD-003", shop: "Quick Copy", file: "Report.pdf", pages: 45, status: "pending", price: 67.5, date: "Yesterday, 4:15 PM", color: "B&W", copies: 2 },
+    { id: "ORD-004", shop: "Ravi Xerox", file: "Notes.pdf", pages: 8, status: "accepted", price: 12, date: "Yesterday, 2:00 PM", color: "B&W", copies: 1 },
+    { id: "ORD-005", shop: "City Prints", file: "Presentation.pptx", pages: 20, status: "rejected", price: 100, date: "Mar 1, 11:00 AM", color: "Color", copies: 1 },
+  ];
+
+  const steps = ["pending", "accepted", "printing", "ready"];
+
+  return (
+    <div className="fade-in">
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 4 }}>My Orders</div>
+        <div style={{ color: theme.textSecondary, fontSize: 14 }}>Track all your print orders in real-time</div>
+      </div>
+
+      {orders.map((o, i) => (
+        <Card key={o.id} style={{ marginBottom: 16, animationDelay: `${i * 0.05}s` }} className="fade-in">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: o.status !== "rejected" ? 20 : 0 }}>
+            <div style={{ display: "flex", gap: 14 }}>
+              <div style={{ background: theme.accentDim, borderRadius: 10, padding: 12, height: "fit-content" }}>
+                <Icon name="file" size={20} color={theme.accent} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 3 }}>{o.file}</div>
+                <div style={{ fontSize: 13, color: theme.textSecondary, marginBottom: 2 }}>{o.shop} · {o.pages} pages · {o.color} · {o.copies} copy</div>
+                <div style={{ fontSize: 12, color: theme.textMuted, display: "flex", alignItems: "center", gap: 4 }}>
+                  <Icon name="clock" size={11} color={theme.textMuted} /> {o.date}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+              <Badge status={o.status} />
+              <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 16, color: theme.textPrimary }}>₹{o.price}</span>
+            </div>
+          </div>
+
+          {o.status !== "rejected" && (
+            <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+              {steps.map((s, idx) => {
+                const currentIdx = steps.indexOf(o.status);
+                const done = idx <= currentIdx;
+                const active = idx === currentIdx;
+                return (
+                  <div key={s} style={{ display: "flex", alignItems: "center", flex: idx < 3 ? 1 : "none" }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                      <div style={{
+                        width: 20, height: 20, borderRadius: "50%",
+                        background: done ? (active ? theme.accent : theme.success) : theme.border,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: active ? `0 0 0 3px ${theme.accent}33` : "none"
+                      }}>
+                        {done && !active && <Icon name="check" size={10} color="#fff" />}
+                        {active && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      <span style={{ fontSize: 10, color: done ? theme.textPrimary : theme.textMuted, fontWeight: done ? 600 : 400, textTransform: "capitalize", whiteSpace: "nowrap" }}>{s}</span>
+                    </div>
+                    {idx < 3 && <div style={{ flex: 1, height: 2, background: idx < currentIdx ? theme.success : theme.border, margin: "0 4px", marginBottom: 18 }} />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+// ─── SHOP OWNER VIEWS ─────────────────────────────────────────────────────────
+
+const ShopDashboard = () => {
+  const orders = [
+    { id: "ORD-101", customer: "Arjun Kumar", file: "Assignment.pdf", pages: 12, status: "pending", price: 18, time: "2 min ago", color: "B&W" },
+    { id: "ORD-102", customer: "Priya Sharma", file: "Resume.docx", pages: 3, status: "printing", price: 15, time: "15 min ago", color: "Color" },
+    { id: "ORD-103", customer: "Rahul Singh", file: "Report.pdf", pages: 45, status: "accepted", price: 67.5, time: "30 min ago", color: "B&W" },
+  ];
+
+  const [orderList, setOrderList] = useState(orders);
+
+  const updateStatus = (id, status) => {
+    setOrderList(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+  };
+
+  return (
+    <div className="fade-in">
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Shop Dashboard</div>
+        <div style={{ color: theme.textSecondary, fontSize: 14 }}>Ravi Xerox · MG Road · <span style={{ color: theme.success }}>● Open</span></div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
+        <StatCard label="Today's Orders" value="8" icon="order" />
+        <StatCard label="Queue Length" value="3" icon="clock" accent={theme.warning} />
+        <StatCard label="Completed" value="5" icon="check" accent={theme.success} />
+        <StatCard label="Today's Revenue" value="₹285" icon="star" accent="#f59e0b" />
+      </div>
+
+      <Card>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 20, fontSize: 16 }}>Incoming Orders</div>
+        {orderList.map((o, i) => (
+          <div key={o.id} style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "16px 0", borderBottom: i < orderList.length - 1 ? `1px solid ${theme.border}` : "none"
+          }}>
+            <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+              <div style={{ background: theme.accentDim, borderRadius: 8, padding: 10 }}>
+                <Icon name="file" size={18} color={theme.accent} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, marginBottom: 2 }}>{o.file}</div>
+                <div style={{ fontSize: 12, color: theme.textSecondary }}>{o.customer} · {o.pages} pages · {o.color}</div>
+                <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                  <Icon name="clock" size={10} color={theme.textMuted} /> {o.time}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <Badge status={o.status} />
+              <span style={{ fontWeight: 700, fontSize: 14, color: theme.textPrimary }}>₹{o.price}</span>
+              <div style={{ display: "flex", gap: 6 }}>
+                {o.status === "pending" && (
+                  <>
+                    <Button variant="success" small icon="check" onClick={() => updateStatus(o.id, "accepted")}>Accept</Button>
+                    <Button variant="danger" small icon="x" onClick={() => updateStatus(o.id, "rejected")}>Reject</Button>
+                  </>
+                )}
+                {o.status === "accepted" && (
+                  <Button variant="secondary" small onClick={() => updateStatus(o.id, "printing")}>Start Print</Button>
+                )}
+                {o.status === "printing" && (
+                  <Button variant="success" small onClick={() => updateStatus(o.id, "ready")}>Mark Ready</Button>
+                )}
+                {(o.status === "ready" || o.status === "rejected") && (
+                  <span style={{ fontSize: 12, color: theme.textMuted }}>No action</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+};
+
+// ─── ADMIN VIEWS ──────────────────────────────────────────────────────────────
+
+const AdminDashboard = () => {
+  const shops = [
+    { id: 1, name: "Ravi Xerox", owner: "Ravi Kumar", address: "MG Road", status: "approved", orders: 142 },
+    { id: 2, name: "QuickPrint Co", owner: "Meena Singh", address: "Koramangala", status: "under review", orders: 0 },
+    { id: 3, name: "Digital Docs", owner: "Sanjay Gupta", address: "HSR Layout", status: "under review", orders: 0 },
+    { id: 4, name: "City Prints", owner: "Priya Nair", address: "Indiranagar", status: "approved", orders: 89 },
+  ];
+  const [shopList, setShopList] = useState(shops);
+
+  const approveShop = id => setShopList(prev => prev.map(s => s.id === id ? { ...s, status: "approved" } : s));
+  const rejectShop = id => setShopList(prev => prev.filter(s => s.id !== id));
+
+  return (
+    <div className="fade-in">
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Admin Overview</div>
+        <div style={{ color: theme.textSecondary, fontSize: 14 }}>Platform management dashboard</div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
+        <StatCard label="Total Users" value="1,284" icon="user" />
+        <StatCard label="Active Shops" value="18" icon="shop" accent={theme.success} />
+        <StatCard label="Pending Approval" value="2" icon="clock" accent={theme.warning} />
+        <StatCard label="Orders Today" value="96" icon="order" accent="#38bdf8" />
+      </div>
+
+      <Card>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 20, fontSize: 16 }}>Shop Management</div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${theme.border}` }}>
+                {["Shop Name", "Owner", "Location", "Orders", "Status", "Actions"].map(h => (
+                  <th key={h} style={{ textAlign: "left", padding: "8px 12px", fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.6px" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {shopList.map((s, i) => (
+                <tr key={s.id} style={{ borderBottom: i < shopList.length - 1 ? `1px solid ${theme.border}22` : "none" }}>
+                  <td style={{ padding: "14px 12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ background: theme.accentDim, borderRadius: 8, padding: 8 }}><Icon name="print" size={14} color={theme.accent} /></div>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>{s.name}</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: "14px 12px", fontSize: 13, color: theme.textSecondary }}>{s.owner}</td>
+                  <td style={{ padding: "14px 12px", fontSize: 13, color: theme.textSecondary }}>{s.address}</td>
+                  <td style={{ padding: "14px 12px", fontSize: 13, fontWeight: 600 }}>{s.orders}</td>
+                  <td style={{ padding: "14px 12px" }}><Badge status={s.status} /></td>
+                  <td style={{ padding: "14px 12px" }}>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {s.status === "under review" ? (
+                        <>
+                          <Button variant="success" small icon="check" onClick={() => approveShop(s.id)}>Approve</Button>
+                          <Button variant="danger" small icon="x" onClick={() => rejectShop(s.id)}>Reject</Button>
+                        </>
+                      ) : (
+                        <Button variant="ghost" small icon="eye">View</Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// ─── AUTH PAGES ───────────────────────────────────────────────────────────────
+const AuthPage = ({ onLogin }) => {
+  const [mode, setMode] = useState("login");
+  const [role, setRole] = useState("customer");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  return (
+    <div style={{
+      minHeight: "100vh", background: theme.bg,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      position: "relative", overflow: "hidden"
+    }}>
+      {/* Background */}
+      <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+        <div style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, ${theme.accent}18, transparent 70%)`, top: -100, right: -100 }} />
+        <div style={{ position: "absolute", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, #22d3a518, transparent 70%)`, bottom: -100, left: -100 }} />
+      </div>
+
+      <div className="fade-in" style={{ width: "100%", maxWidth: 420, padding: "0 20px" }}>
+        {/* Logo */}
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <div style={{ background: theme.accent, borderRadius: 16, width: 56, height: 56, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+            <Icon name="print" size={26} color="#fff" />
+          </div>
+          <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, marginBottom: 4 }}>PrintQ</div>
+          <div style={{ fontSize: 14, color: theme.textSecondary }}>Digital Print Order Platform</div>
+        </div>
+
+        <Card style={{ padding: 32 }}>
+          {/* Mode toggle */}
+          <div style={{ display: "flex", background: theme.bg, borderRadius: 10, padding: 4, marginBottom: 24 }}>
+            {["login", "register"].map(m => (
+              <button key={m} onClick={() => setMode(m)} style={{
+                flex: 1, padding: "9px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                background: mode === m ? theme.accent : "transparent",
+                color: mode === m ? "#fff" : theme.textSecondary,
+                fontWeight: 600, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                transition: "all 0.2s"
+              }}>{m === "login" ? "Sign In" : "Register"}</button>
+            ))}
+          </div>
+
+          {mode === "register" && (
+            <>
+              <Input label="Full Name" value={name} onChange={e => setName(e.target.value)} placeholder="Arjun Kumar" />
+              <Select label="I am a" value={role} onChange={e => setRole(e.target.value)}
+                options={[{ value: "customer", label: "👤 Customer" }, { value: "shop", label: "🖨️ Shop Owner" }]} />
+            </>
+          )}
+          <Input label="Email / Phone" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
+          <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" />
+
+          {mode === "login" && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: theme.textSecondary, marginBottom: 8 }}>Sign in as:</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {["customer", "shop", "admin"].map(r => (
+                  <button key={r} onClick={() => setRole(r)} style={{
+                    flex: 1, padding: "8px 0", borderRadius: 8, border: `1px solid ${role === r ? theme.accent : theme.border}`,
+                    background: role === r ? theme.accentDim : "transparent",
+                    color: role === r ? theme.accent : theme.textSecondary,
+                    cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                    textTransform: "capitalize", transition: "all 0.15s"
+                  }}>{r}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Button style={{ width: "100%", justifyContent: "center", marginTop: 4 }} onClick={() => onLogin(role)}>
+            {mode === "login" ? "Sign In →" : "Create Account →"}
+          </Button>
+
+          {mode === "login" && (
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <span style={{ fontSize: 12, color: theme.textMuted, cursor: "pointer" }}>Forgot password?</span>
+            </div>
+          )}
+        </Card>
+
+        <div style={{ textAlign: "center", marginTop: 20, fontSize: 12, color: theme.textMuted }}>
+          Secure · Encrypted · Trusted by 1,000+ users
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── MAIN LAYOUT ──────────────────────────────────────────────────────────────
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [active, setActive] = useState("dashboard");
+
+  if (!user) return <><style>{styles}</style><AuthPage onLogin={role => { setUser(role); setActive("dashboard"); }} /></>;
+
+  const renderContent = () => {
+    if (user === "customer") {
+      if (active === "dashboard") return <CustomerDashboard setActive={setActive} />;
+      if (active === "upload") return <UploadOrder setActive={setActive} />;
+      if (active === "orders") return <CustomerOrders />;
+      if (active === "shops") return (
+        <div className="fade-in">
+          <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>Find Nearby Shops</div>
+          {[
+            { name: "Ravi Xerox", address: "MG Road, near bus stand", bw: 1.5, color: 5, rating: 4.8, orders: 142, status: "open" },
+            { name: "City Prints", address: "Koramangala 5th Block", bw: 2, color: 6, rating: 4.5, orders: 89, status: "open" },
+            { name: "Quick Copy", address: "HSR Layout Sector 4", bw: 1, color: 4.5, rating: 4.2, orders: 56, status: "busy" },
+          ].map((s, i) => (
+            <Card key={s.name} style={{ marginBottom: 16, animationDelay: `${i * 0.1}s` }} className="fade-in">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div style={{ display: "flex", gap: 16 }}>
+                  <div style={{ background: theme.accentDim, borderRadius: 12, padding: 14, height: "fit-content" }}>
+                    <Icon name="print" size={22} color={theme.accent} />
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.name}</div>
+                    <div style={{ fontSize: 13, color: theme.textSecondary, display: "flex", alignItems: "center", gap: 4, marginBottom: 8 }}>
+                      <Icon name="pin" size={13} color={theme.textMuted} /> {s.address}
+                    </div>
+                    <div style={{ display: "flex", gap: 16, fontSize: 13 }}>
+                      <span style={{ color: theme.textSecondary }}>B&W: <strong style={{ color: theme.textPrimary }}>₹{s.bw}/pg</strong></span>
+                      <span style={{ color: theme.textSecondary }}>Color: <strong style={{ color: theme.textPrimary }}>₹{s.color}/pg</strong></span>
+                      <span style={{ color: theme.textSecondary }}>Orders: <strong style={{ color: theme.textPrimary }}>{s.orders}</strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <Icon name="star" size={13} color={theme.warning} />
+                    <span style={{ fontWeight: 700, color: theme.warning }}>{s.rating}</span>
+                  </div>
+                  <span style={{ fontSize: 12, color: s.status === "open" ? theme.success : theme.warning, fontWeight: 600 }}>● {s.status}</span>
+                  <Button variant="secondary" small icon="print">Order Here</Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+    if (user === "shop") {
+      if (active === "dashboard" || active === "orders") return <ShopDashboard />;
+      if (active === "profile") return (
+        <div className="fade-in">
+          <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>Shop Profile</div>
+          <div style={{ maxWidth: 500 }}>
+            <Card>
+              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: 20 }}>Shop Details</div>
+              <Input label="Shop Name" value="Ravi Xerox" onChange={() => {}} />
+              <Input label="Address" value="MG Road, near bus stand, Bengaluru" onChange={() => {}} />
+              <Input label="Contact Phone" value="+91 98765 43210" onChange={() => {}} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Input label="B&W Price/Page (₹)" value="1.5" type="number" onChange={() => {}} />
+                <Input label="Color Price/Page (₹)" value="5" type="number" onChange={() => {}} />
+              </div>
+              <Button icon="check">Save Changes</Button>
+            </Card>
+          </div>
+        </div>
+      );
+    }
+    if (user === "admin") return <AdminDashboard />;
+    return null;
+  };
+
+  return (
+    <>
+      <style>{styles}</style>
+      <div style={{ display: "flex", minHeight: "100vh" }}>
+        <Sidebar role={user} active={active} setActive={setActive} />
+        <main style={{ marginLeft: 240, flex: 1, padding: "36px 36px", maxWidth: "calc(100vw - 240px)" }}>
+          {renderContent()}
+        </main>
+      </div>
+    </>
+  );
+}
